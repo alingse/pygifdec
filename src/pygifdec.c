@@ -9,6 +9,15 @@ static PyObject* add(PyObject* self, PyObject* args) {
     return Py_BuildValue("d", result);
 }
 
+static PyObject* open_gif(PyObject* self, PyObject* args) {
+    double a, b, result;
+    if (!PyArg_ParseTuple(args, "dd", &a, &b)) {
+        return NULL;
+    }
+    result = a+b;
+    return Py_BuildValue("d", result);
+}
+
 static PyMethodDef methods[] = {
     {"add", add, METH_VARARGS, "add functions"},
     {NULL, NULL, 0, NULL}
