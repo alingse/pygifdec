@@ -9,15 +9,15 @@ static PyObject* add(PyObject* self, PyObject* args) {
     return Py_BuildValue("d", result);
 }
 
-static PyMethodDef MyMethods[] = {
+static PyMethodDef methods[] = {
     {"add", add, METH_VARARGS, "add functions"},
     {NULL, NULL, 0, NULL}
 };
 
-static struct PyModuleDef mymodule = {
-    PyModuleDef_HEAD_INIT, "pygifdec", NULL, -1, MyMethods
+static struct PyModuleDef pygifdec = {
+    PyModuleDef_HEAD_INIT, "pygifdec", NULL, -1, methods
 };
 
-PyMODINIT_FUNC PyInit_mymodule(void) {
-    return PyModule_Create(&mymodule);
+PyMODINIT_FUNC PyInit_pygifdec(void) {
+    return PyModule_Create(&pygifdec);
 }
