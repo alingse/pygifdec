@@ -5,6 +5,7 @@
   "python.formatting.provider": "none",
   "files.associations": {
     "random": "c",
-    "python.h": "c"
+    "python.h": "c",
+    "object.h": "c"
   }
 }

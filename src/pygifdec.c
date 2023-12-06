@@ -1,6 +1,6 @@
 #include <Python.h>
-#include "gifdec.h"
 #include <object.h>
+#include "gifdec.h"
 
 static PyObject *add(PyObject *self, PyObject *args)
 {
@@ -16,10 +16,15 @@ static PyObject *add(PyObject *self, PyObject *args)
 static PyMethodDef methods_of_GIF[] = {
     {NULL, NULL, 0, NULL}};
 
-static PyTypeObject GIF = {
+typedef struct GIF
+{
+    uint8_t *gd_GIF;
+} GIF;
+
+static PyTypeObject PyGIF = {
     PyVarObject_HEAD_INIT(NULL, 0)
         .tp_name = "pygifdec.GIF",
-    .tp_basicsize = sizeof(gd_GIF),
+    .tp_basicsize = sizeof(GIF),
     .tp_itemsize = 0,
     .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_doc = "GIF object",
@@ -38,17 +43,27 @@ static PyObject *open_gif(PyObject *self, PyObject *args)
     {
         Py_RETURN_NONE;
     }
-    gd_GIF *result = PyObject_New(gd_GIF, &GIF);
-    //*result = *gif;
-    // copy
+
+    GIF *result = PyObject_New(GIF, &PyGIF);
+    result->gd_GIF = gif;
+    /*
+    //  copy
     result->fd = gif->fd;
     result->anim_start = gif->anim_start;
-
     result->width = gif->width;
-    result->height = 0;
-    // result->height = 1;
+    uint16_t a = gif->height;
+    printf("gif size %zu \n", sizeof(gif));
+    printf("*gif size %zu \n", sizeof(*gif));
+    printf("result size %zu \n", sizeof(result));
+    printf("*result size %zu \n", sizeof(*result));
+    // result->height++;
+    //  result->height = 1;
+    result->depth;
+    result->height;
+    // = gif->depth;
+    */
     /*
-    result->depth = gif->depth;
+
 
 result->loop_count = gif->loop_count;
 result->gce = gif->gce;
@@ -110,11 +125,11 @@ static struct PyModuleDef pygifdec = {
 PyMODINIT_FUNC PyInit_pygifdec(void)
 {
     PyObject *module = PyModule_Create(&pygifdec);
-    if (PyType_Ready(&GIF) < 0)
+    if (PyType_Ready(&PyGIF) < 0)
         return NULL;
 
-    Py_INCREF(&GIF);
-    PyModule_AddObject(module, "GIF", (PyObject *)&GIF);
+    Py_INCREF(&PyGIF);
+    PyModule_AddObject(module, "GIF", (PyObject *)&PyGIF);
 
     return PyModule_Create(&pygifdec);
 }
