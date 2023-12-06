@@ -1,10 +1,8 @@
 from distutils.core import setup, Extension
 
-pygifdec = Extension('pygifdec',
-                     sources=['./src/pygifdec.c', './src/gifdec.c'],
-                     include_dirs=['./src/include/'])
+pygifdec = Extension('pygifdec', sources=['./src/pygifdec.c'])
 
 setup(name='pygifdec',
-      version='1.0',
-      description='a python wrapper for gifdec',
+      version='0.0.1',
+      description='a pygifdec',
       ext_modules=[pygifdec])
