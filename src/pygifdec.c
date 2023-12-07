@@ -5,6 +5,7 @@
 typedef struct GIF
 {
     PyObject_HEAD;
+    uint16_t size;
     PyObject *width;
     PyObject *height;
     PyObject *depth;
@@ -32,8 +33,39 @@ static PyObject *GIF_make_bgcolor(PyObject *self, PyObject *args)
     return pyColors;
 }
 
+static PyObject *GIF_render_frame(PyObject *self, PyObject *args)
+{
+    PyObject *byteObj;
+    if (!PyArg_ParseTuple(args, "O", &byteObj))
+    {
+        return NULL;
+    }
+
+    if (!PyByteArray_Check(byteObj))
+    {
+        PyErr_SetString(PyExc_TypeError, "Expected a bytearray object");
+        return NULL;
+    }
+
+    unsigned char *data = (unsigned char *)PyByteArray_AsString(byteObj);
+    if (data == NULL)
+    {
+        return NULL;
+    }
+    Py_ssize_t length = PyByteArray_Size(byteObj);
+    GIF *gif = (GIF *)self;
+    if (length != gif->size)
+    {
+        PyErr_SetString(PyExc_TypeError, "bytearray length must mutch the frame");
+        return NULL;
+    }
+    gd_render_frame(gif->gd_GIF_ptr, data);
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef GIF_methods[] = {
     {"close", GIF_close, METH_NOARGS, "close the gif"},
+    {"render_frame", GIF_render_frame, METH_NOARGS, "render a gif "},
     {NULL, NULL, 0, NULL}};
 
 static PyObject *GIF_get_width(GIF *self, void *closure)
@@ -93,6 +125,7 @@ static PyObject *open_gif(PyObject *self, PyObject *args)
 
     GIF *result = (GIF *)PyObject_New(GIF, &PyGIF);
     result->gd_GIF_ptr = gif;
+    result->size = gif->width * gif->height * 3;
     result->width = Py_BuildValue("i", gif->width);
     result->height = Py_BuildValue("i", gif->height);
     result->depth = Py_BuildValue("i", gif->depth);
