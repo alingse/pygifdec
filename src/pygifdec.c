@@ -5,7 +5,7 @@
 typedef struct GIF
 {
     PyObject_HEAD;
-    uint64_t size;
+    Py_ssize_t size;
     PyObject *width;
     PyObject *height;
     PyObject *depth;
@@ -61,16 +61,18 @@ unsigned char *parse_args_frame_bytearray(GIF *self, PyObject *args)
     return data;
 }
 
-static PyObject *GIF_render_frame(GIF *self, PyObject *args)
+static PyObject *GIF_render_frame(PyObject *self, PyObject *args)
 {
-    unsigned char *data = parse_args_frame_bytearray(self, args);
-    gd_render_frame(self->gd_GIF_ptr, data);
+    GIF *gif = (GIF *)self;
+    unsigned char *data = parse_args_frame_bytearray(gif, args);
+    gd_render_frame(gif->gd_GIF_ptr, data);
     Py_RETURN_NONE;
 }
 
-static PyObject *GIF_get_frame(GIF *self, PyObject *args)
+static PyObject *GIF_get_frame(PyObject *self, PyObject *args)
 {
-    int ret = gd_get_frame(self->gd_GIF_ptr);
+    GIF *gif = (GIF *)self;
+    int ret = gd_get_frame(gif->gd_GIF_ptr);
     return Py_BuildValue("i", ret);
 }
 
