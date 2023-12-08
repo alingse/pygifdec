@@ -41,4 +41,4 @@ jobs:
       - name: Test with pytest
         run: |
           echo "hello"
-          # pytest
+          pytest
