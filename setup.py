@@ -9,7 +9,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
     readme = f.read()
 
 setup(name='pygifdec',
-      version='0.0.2',
+      version='0.0.2a1',
       author='alingse',
       author_email='alingse@foxmail.com',
       description='a python gifdec wrapper',
