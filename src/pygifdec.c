@@ -5,7 +5,7 @@
 typedef struct GIF
 {
     PyObject_HEAD;
-    uint16_t size;
+    uint64_t size;
     PyObject *width;
     PyObject *height;
     PyObject *depth;
@@ -33,7 +33,7 @@ static PyObject *GIF_make_bgcolor(PyObject *self, PyObject *args)
     return pyColors;
 }
 
-static PyObject *GIF_render_frame(PyObject *self, PyObject *args)
+unsigned char *parse_args_frame_bytearray(GIF *self, PyObject *args)
 {
     PyObject *byteObj;
     if (!PyArg_ParseTuple(args, "O", &byteObj))
@@ -53,19 +53,31 @@ static PyObject *GIF_render_frame(PyObject *self, PyObject *args)
         return NULL;
     }
     Py_ssize_t length = PyByteArray_Size(byteObj);
-    GIF *gif = (GIF *)self;
-    if (length != gif->size)
+    if (length != self->size)
     {
         PyErr_SetString(PyExc_TypeError, "bytearray length must mutch the frame");
         return NULL;
     }
-    gd_render_frame(gif->gd_GIF_ptr, data);
+    return data;
+}
+
+static PyObject *GIF_render_frame(GIF *self, PyObject *args)
+{
+    unsigned char *data = parse_args_frame_bytearray(self, args);
+    gd_render_frame(self->gd_GIF_ptr, data);
     Py_RETURN_NONE;
+}
+
+static PyObject *GIF_get_frame(GIF *self, PyObject *args)
+{
+    int ret = gd_get_frame(self->gd_GIF_ptr);
+    return Py_BuildValue("i", ret);
 }
 
 static PyMethodDef GIF_methods[] = {
     {"close", GIF_close, METH_NOARGS, "close the gif"},
-    {"render_frame", GIF_render_frame, METH_NOARGS, "render a gif "},
+    {"render_frame", GIF_render_frame, METH_VARARGS, "render a gif"},
+    {"get_frame", GIF_get_frame, METH_VARARGS, "get a new frame"},
     {NULL, NULL, 0, NULL}};
 
 static PyObject *GIF_get_width(GIF *self, void *closure)
@@ -92,11 +104,17 @@ static PyObject *GIF_get_bgcolor(GIF *self, void *closure)
     return self->bgcolor;
 }
 
+static PyObject *GIF_get_size(GIF *self, void *closure)
+{
+    return Py_BuildValue("i", self->size);
+}
+
 static PyGetSetDef GIF_getset[] = {
     {"width", (getter)GIF_get_width, NULL, "GIF width", NULL},
     {"height", (getter)GIF_get_height, NULL, "GIF height", NULL},
     {"depth", (getter)GIF_get_depth, NULL, "GIF depth", NULL},
     {"bgcolor", (getter)GIF_get_bgcolor, NULL, "GIF bgcolor", NULL},
+    {"size", (getter)GIF_get_size, NULL, "GIF size", NULL},
     {NULL, NULL, NULL, NULL, NULL}};
 
 static PyTypeObject PyGIF = {
