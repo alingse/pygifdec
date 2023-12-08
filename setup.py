@@ -1,4 +1,4 @@
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 
 pygifdec = Extension('pygifdec',
                      sources=['./src/pygifdec.c', './src/gifdec.c'],
@@ -9,7 +9,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
     readme = f.read()
 
 setup(name='pygifdec',
-      version='0.0.2a1',
+      version='0.0.2a2',
       author='alingse',
       author_email='alingse@foxmail.com',
       description='a python gifdec wrapper',
